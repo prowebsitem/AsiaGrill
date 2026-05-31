@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Lecteur HLS</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<style>
+html,body{
+    margin:0;
+    background:#000;
+    height:100%;
+}
+
+#video{
+    width:100%;
+    height:100vh;
+    background:#000;
+}
+</style>
+</head>
+<body>
+
+<video
+    id="video"
+    controls
+    autoplay
+    playsinline
+></video>
+
+<script>
+
+const video = document.getElementById("video");
+
+const source =
+    "https://asiagrill.alwaysdata.net/hls/index.m3u8";
+
+if (Hls.isSupported()) {
+
+    const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false
+    });
+
+    hls.loadSource(source);
+
+    hls.attachMedia(video);
+
+    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        video.play().catch(() => {});
+    });
+
+    hls.on(Hls.Events.ERROR, function(event, data) {
+        console.log("HLS ERROR", data);
+    });
+
+}
+else if (
+    video.canPlayType(
+        "application/vnd.apple.mpegurl"
+    )
+) {
+
+    video.src = source;
+
+    video.addEventListener("loadedmetadata", () => {
+        video.play().catch(() => {});
+    });
+
+}
+else {
+
+    document.body.innerHTML =
+        "<h1 style='color:white'>HLS non supporté</h1>";
+
+}
+
+</script>
+
+</body>
+</html>
